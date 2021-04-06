@@ -27,9 +27,9 @@ namespace Nonograms
             await Navigation.PushAsync(new BlackCrossMenu());
         }
 
-        private void ColorCrossButton_Clicked(object sender, EventArgs e)
+        private async void ColorCrossButton_Clicked(object sender, EventArgs e)
         {
-
+            await Navigation.PushAsync(new ColorCrossMenu());
         }
 
         private void MyCrossButton_Clicked(object sender, EventArgs e)

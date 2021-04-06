@@ -16,5 +16,20 @@ namespace Nonograms
         {
             InitializeComponent();
         }
+
+        private async void FiveToFiveButton_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new FiveToFiveMenu());
+        }
+
+        private void TenToTenButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
+
+        private void FifteenToFifteenButton_Clicked(object sender, EventArgs e)
+        {
+
+        }
     }
 }

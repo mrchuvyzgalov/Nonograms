@@ -156,6 +156,9 @@
       <Name>Nonograms</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Black Crosswords\5x5\Snake.jap" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

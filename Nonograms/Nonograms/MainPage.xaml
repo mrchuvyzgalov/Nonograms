@@ -9,7 +9,7 @@
                 <Label Text="Японские кроссворды" FontSize="Large" HorizontalOptions="Center" TextColor="Black"/>
             </Frame>
             
-            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="End" Margin="30">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" Margin="30">
                 <Frame HorizontalOptions="Start" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" >
                     <Button x:Name = "PlayButton" Text="Играть" BackgroundColor="#e1e1e1" FontSize="Medium" Clicked="PlayButton_Clicked"/>
                 </Frame>
