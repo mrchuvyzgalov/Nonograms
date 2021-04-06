@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity
+    Name="25c773a0-d0ab-4ed9-8775-a4eb46fd30b3"
+    Publisher="CN=41cd1564-71cb-40a5-b3b2-32d4e68b2750"
+    Version="1.0.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>Nonograms.UWP</DisplayName>
+    <PublisherDisplayName>41cd1564-71cb-40a5-b3b2-32d4e68b2750</PublisherDisplayName>
+    <Logo>Icon.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="Nonograms.UWP.App">
+      <uap:VisualElements
+        DisplayName="Nonograms.UWP"
+        Square44x44Logo="Icon.png"
+        Description="Nonograms.UWP"
+        BackgroundColor="transparent" Square150x150Logo="Icon.png">
+        <uap:DefaultTile  Square71x71Logo="Icon.png" Wide310x150Logo="Icon.png" Square310x310Logo="Icon.png">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+            <uap:ShowOn Tile="wide310x150Logo"/>
+            <uap:ShowOn Tile="square310x310Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile>
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
