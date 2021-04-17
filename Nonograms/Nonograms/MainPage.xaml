@@ -5,15 +5,15 @@
     
     <ContentPage.Content>
         <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
-            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" >
+            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15">
                 <Label Text="Японские кроссворды" FontSize="Large" HorizontalOptions="Center" TextColor="Black"/>
             </Frame>
             
             <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" Margin="30">
-                <Frame HorizontalOptions="Start" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" >
+                <Frame HorizontalOptions="Start" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
                     <Button x:Name = "PlayButton" Text="Играть" BackgroundColor="#e1e1e1" FontSize="Medium" Clicked="PlayButton_Clicked"/>
                 </Frame>
-                <Frame HorizontalOptions="End" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" >
+                <Frame HorizontalOptions="End" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
                     <Button x:Name ="SolveButton" Text="Решить" BackgroundColor="#e1e1e1" FontSize="Medium" Clicked="SolveButton_Clicked"/>
                 </Frame>
             </StackLayout>

@@ -4,14 +4,14 @@
              x:Class="Nonograms.BlackCrossMenu"
              Title="Черно-белые кроссворды">
     <ContentPage.Content>
-        <StackLayout HorizontalOptions="Fill" Padding="100,100,100,100">
-            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15">
+        <StackLayout HorizontalOptions="Center">
+            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
                 <Button x:Name="FiveToFiveButton" BackgroundColor="Transparent" Text="5x5" FontSize="Large" HorizontalOptions="Center" TextColor="Black" Clicked="FiveToFiveButton_Clicked"/>
             </Frame>
-            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15">
+            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
                 <Button x:Name="TenToTenButton" BackgroundColor="Transparent" Text="10x10" FontSize="Large" HorizontalOptions="Center" TextColor="Black" Clicked="TenToTenButton_Clicked"/>
             </Frame>
-            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15">
+            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
                 <Button x:Name="FifteenToFifteenButton" BackgroundColor="Transparent" Text="15x15" FontSize="Large" HorizontalOptions="Center" TextColor="Black" Clicked="FifteenToFifteenButton_Clicked"/>
             </Frame>
         </StackLayout>
