@@ -19,7 +19,7 @@ namespace Nonograms
 
         private async void SnakeButton_Clicked(object sender, EventArgs e)
         {
-			await Navigation.PushAsync(new Nonogram(@"Snake.jap"));
+			await Navigation.PushAsync(new Nonogram(@"Black Crosswords\5x5\Snake.jap"));
         }
     }
 }

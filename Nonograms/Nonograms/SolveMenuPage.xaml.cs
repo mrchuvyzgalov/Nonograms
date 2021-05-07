@@ -23,7 +23,7 @@ namespace Nonograms
 
             try
             {
-                using (StreamReader sr = new StreamReader(@"Phone.jap"))
+                using (StreamReader sr = new StreamReader(@"Black Crosswords\10x10\Question.jap"))
                 {
                     string[] line = sr.ReadLine().Split(new char[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     if (line.Length != 2) throw new Exception();
