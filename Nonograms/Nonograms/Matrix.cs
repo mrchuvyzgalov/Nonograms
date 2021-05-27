@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Nonograms
 {
-    class Matrix<T>
+    public class Matrix<T>
     {
         T[,] matrix;
 

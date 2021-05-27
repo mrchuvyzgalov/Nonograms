@@ -1,29 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Nonograms.Nonogram"
+             x:Class="Nonograms.DrawNonogram"
              BackgroundImageSource="Background.png">
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.9*"/>
+                <RowDefinition Height="0.7*"/>
                 <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="0.2*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Grid x:Name="table" VerticalOptions="Start" HorizontalOptions="Fill" Grid.Row="0" Grid.Column="0">
-                
+            <Grid x:Name="table" VerticalOptions="Fill" HorizontalOptions="Fill" Grid.Row="0" Grid.Column="0">
+
             </Grid>
             <Grid x:Name="colorsGrid" VerticalOptions="Fill" HorizontalOptions="Fill" Grid.Row="1" Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    
+
                 </Grid.ColumnDefinitions>
             </Grid>
-            
-        </Grid> 
+
+            <Grid HorizontalOptions="Center" VerticalOptions="Center" Margin="3,3,3,3" Grid.Row="2" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <ImageButton x:Name ="Create" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="Create_Clicked" BackgroundColor="Transparent"/>
+                <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Создать" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+            </Grid>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

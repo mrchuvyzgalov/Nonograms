@@ -1,21 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Nonograms.MainPage">
+             x:Class="Nonograms.MainPage"
+             BackgroundImageSource="Background.png">
     
     <ContentPage.Content>
-        <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
-            <Frame BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15">
-                <Label Text="Японские кроссворды" FontSize="Large" HorizontalOptions="Center" TextColor="Black"/>
-            </Frame>
-            
-            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" Margin="30">
-                <Frame HorizontalOptions="Start" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
-                    <Button x:Name = "PlayButton" Text="Играть" BackgroundColor="#e1e1e1" FontSize="Medium" Clicked="PlayButton_Clicked"/>
-                </Frame>
-                <Frame HorizontalOptions="End" BorderColor="Gray" BackgroundColor="#e1e1e1" CornerRadius="15" Padding="0">
-                    <Button x:Name ="SolveButton" Text="Решить" BackgroundColor="#e1e1e1" FontSize="Medium" Clicked="SolveButton_Clicked"/>
-                </Frame>
+        <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Margin="10,10,10,10" VerticalOptions="CenterAndExpand">
+                <Grid HorizontalOptions="Center" VerticalOptions="Center" Margin="10,10,10,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Image HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0"/>
+                    <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Японские кроссворды" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+                </Grid>
+            </StackLayout>
+
+            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="10,10,10,10" VerticalOptions="Center">
+                <Grid HorizontalOptions="Center" VerticalOptions="Center" Margin="10,10,10,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ImageButton x:Name ="PlayButton" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="PlayButton_Clicked" BackgroundColor="Transparent"/>
+                    <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Играть" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+                </Grid>
+                <Grid HorizontalOptions="Center" VerticalOptions="Center" Margin="10,10,10,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ImageButton x:Name ="SolveButton" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="SolveButton_Clicked" BackgroundColor="Transparent"/>
+                    <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Решить" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+                </Grid>
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

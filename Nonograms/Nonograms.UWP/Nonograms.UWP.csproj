@@ -133,7 +133,8 @@
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
     <Content Include="awards.png" />
-    <None Include="Black Crosswords\10x10\Question.jap" />
+    <Content Include="Background.png" />
+    <Content Include="Button.png" />
     <Content Include="Icon.png" />
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
@@ -157,9 +158,6 @@
       <Project>{9B08AFE6-90B4-4DDE-B263-CF099AE3C5B0}</Project>
       <Name>Nonograms</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Black Crosswords\5x5\Snake.jap" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
