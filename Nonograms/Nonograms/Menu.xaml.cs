@@ -98,17 +98,20 @@ namespace Nonograms
 
                 image.Clicked += Image_Clicked;
 
-                Label label = new Label
+                Button button = new Button
                 {
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     Text = file.Name.Split(new char[] { '.' })[0],
                     TextColor = Color.Black,
-                    FontSize = 20.0
+                    FontSize = 17.0,
+                    BackgroundColor = Color.Transparent
                 };
 
+                button.Clicked += Image_Clicked;
+
                 grid.Children.Add(image, 0, 0);
-                grid.Children.Add(label, 0, 0);
+                grid.Children.Add(button, 0, 0);
 
                 stack.Children.Add(grid);
                 MainStack.Children.Add(stack);
@@ -117,15 +120,31 @@ namespace Nonograms
 
         private async void Image_Clicked(object sender, EventArgs e)
         {
-            ImageButton image = (ImageButton)sender;
             int index = 0;
-            foreach (StackLayout stack in MainStack.Children)
+
+            if (sender is ImageButton)
             {
-                if (((Grid)stack.Children[0]).Children.Contains(image))
+                ImageButton image = (ImageButton)sender;
+                foreach (StackLayout stack in MainStack.Children)
                 {
-                    break;
+                    if (((Grid)stack.Children[0]).Children.Contains(image))
+                    {
+                        break;
+                    }
+                    index++;
                 }
-                index++;
+            }
+            else
+            {
+                Button image = (Button)sender;
+                foreach (StackLayout stack in MainStack.Children)
+                {
+                    if (((Grid)stack.Children[0]).Children.Contains(image))
+                    {
+                        break;
+                    }
+                    index++;
+                }
             }
 
             if (isFiles)
@@ -176,17 +195,20 @@ namespace Nonograms
 
                 image.Clicked += Image_Clicked;
 
-                Label label = new Label
+                Button button = new Button
                 {
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     Text = dir.Name,
                     TextColor = Color.Black,
-                    FontSize = 20.0
+                    FontSize = 17.0,
+                    BackgroundColor = Color.Transparent
                 };
 
+                button.Clicked += Image_Clicked;
+
                 grid.Children.Add(image, 0, 0);
-                grid.Children.Add(label, 0, 0);
+                grid.Children.Add(button, 0, 0);
 
                 stack.Children.Add(grid);
                 MainStack.Children.Add(stack);

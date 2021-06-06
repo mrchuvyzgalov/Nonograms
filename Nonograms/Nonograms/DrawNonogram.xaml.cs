@@ -15,19 +15,15 @@ namespace Nonograms
     {
         string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         int rows, cols;
-        HashSet<ColorRGB> colors;
         string name;
         ColorRGB tmpColor = new ColorRGB(255, 255, 255);
-        public DrawNonogram(string name, int rows, int cols, HashSet<ColorRGB> colors)
+        public DrawNonogram(string name, int rows, int cols)
         {
             InitializeComponent();
 
             this.name = name;
             this.rows = rows;
             this.cols = cols;
-            this.colors = colors;
-
-            this.colors.Remove(new ColorRGB(255, 255, 255));
 
             DrawMap();
         }
@@ -61,37 +57,6 @@ namespace Nonograms
                     table.Children.Add(button, col, row);
                 }
             }
-
-            for (int i = 0; i <= colors.Count; ++i)
-            {
-                colorsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            }
-
-            Button button1 = new Button
-            {
-                BackgroundColor = Color.FromRgb(255, 255, 255),
-                BorderColor = Color.GreenYellow
-            };
-
-            button1.Clicked += Button_Click_Color;
-
-            colorsGrid.Children.Add(button1, 0, 0);
-
-            int numbOfColor = 1;
-
-            foreach (ColorRGB color in colors)
-            {
-                button1 = new Button
-                {
-                    BackgroundColor = Color.FromRgb(color.Red, color.Green, color.Blue),
-                    BorderColor = Color.Black
-                };
-
-                button1.Clicked += Button_Click_Color;
-
-                colorsGrid.Children.Add(button1, numbOfColor, 0);
-                numbOfColor++;
-            }
         }
 
         private void GetCoordinates(int number, out int x, out int y)
@@ -100,25 +65,85 @@ namespace Nonograms
             x = number / cols;
         }
 
-        private void Button_Click_Color(object sender, EventArgs e)
+        private async void Button_Click_Color(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            int red = (int)(button.BackgroundColor.R * 255);
-            int green = (int)(button.BackgroundColor.G * 255);
-            int blue = (int)(button.BackgroundColor.B * 255);
-            tmpColor = new ColorRGB(red, green, blue);
 
             for (int i = 0; i < colorsGrid.Children.Count; ++i)
             {
-                ((Button)colorsGrid.Children[i]).BorderColor = Color.Black;
+                Button tmp = ((Button)colorsGrid.Children[i]);
+                tmp.BorderWidth = 1;
+                ColorRGB color = new ColorRGB((int)(tmp.BackgroundColor.R * 255), (int)(tmp.BackgroundColor.G * 255), (int)(tmp.BackgroundColor.B * 255));
+                if (color.isBright())
+                {
+                    tmp.BorderColor = Color.Black;
+                }
+                else
+                {
+                    tmp.BorderColor = Color.White;
+                }
             }
 
-            button.BorderColor = Color.GreenYellow;
+            button.BorderWidth = 5;
+
+            if (button.Text == "⋮")
+            {
+                await Navigation.PushAsync(new RGBPage(tmpColor));
+            }
+            else
+            {
+                int red = (int)(button.BackgroundColor.R * 255);
+                int green = (int)(button.BackgroundColor.G * 255);
+                int blue = (int)(button.BackgroundColor.B * 255);
+                tmpColor = new ColorRGB(red, green, blue);
+            }
         }
 
         private async void Create_Clicked(object sender, EventArgs e)
         {
-            string data = name + "\n";
+            bool hasNoWhite = false;
+            for (int row = 0; row < rows && !hasNoWhite; ++row)
+            {
+                for (int col = 0; col < cols && !hasNoWhite; ++col)
+                {
+                    Button button = (Button)table.Children[GetIndex(row, col)];
+                    int red = (int)(button.BackgroundColor.R * 255);
+                    int green = (int)(button.BackgroundColor.G * 255);
+                    int blue = (int)(button.BackgroundColor.B * 255);
+
+                    hasNoWhite = new ColorRGB(red, green, blue) != new ColorRGB(255, 255, 255); 
+                }
+            }
+
+            if (!hasNoWhite)
+            {
+                await DisplayAlert("Ошибка", "Вы забыли нарисовать изображение", "Ок");
+                return;
+            }
+
+            HashSet<ColorRGB> colors = new HashSet<ColorRGB>();
+            for (int row = 0; row < rows; ++row)
+            {
+                for (int col = 0; col < cols; ++col)
+                {
+                    Button button = (Button)table.Children[GetIndex(row, col)];
+                    int red = (int)(button.BackgroundColor.R * 255);
+                    int green = (int)(button.BackgroundColor.G * 255);
+                    int blue = (int)(button.BackgroundColor.B * 255);
+                    if (new ColorRGB(red, green, blue) != new ColorRGB(255, 255, 255))
+                    {
+                        colors.Add(new ColorRGB(red, green, blue));
+                    }
+                }
+            }
+
+            if (colors.Count > 5)
+            {
+                await DisplayAlert("Ошибка", "Нельзя использовать более пяти цветов в изображении", "Ок");
+                return;
+            }
+
+            string data = "\n";
             data += colors.Count + "\n";
             foreach (ColorRGB color in colors)
             {
@@ -212,6 +237,12 @@ namespace Nonograms
                 m_cols.Add(tmpCol);
             }
 
+            if (NonogramSolve.Solve(new Matrix<KeyValuePair<int, ColorRGB>>(m_rows), new Matrix<KeyValuePair<int, ColorRGB>>(m_cols), colors) == null)
+            {
+                await DisplayAlert("Неподходящий кроссворд", "Нарисуйте другое изображение. Кроссворд имеет несколько решений или его очень долго решать", "Ок");
+                return;
+            }
+
             int rowsMaxi = 0;
             for (int row = 0; row < rows; ++row)
             {
@@ -251,7 +282,7 @@ namespace Nonograms
 
             string path = Path.Combine(folderPath, "Data");
 
-            if (colors.Count == 0 || (colors.Count == 1 && colors.Contains(new ColorRGB(0,0,0))))
+            if (colors.Count == 1 && colors.Contains(new ColorRGB(0,0,0)))
             {
                 path = Path.Combine(path, "Черно-белые кроссворды");
             }
@@ -277,14 +308,14 @@ namespace Nonograms
                     filename = filename.Substring(0, name.Length) + "" + numb;
                 }
 
-                File.WriteAllText(Path.Combine(path, filename) + ".jap", data);
+                File.WriteAllText(Path.Combine(path, filename) + ".jap", filename + data);
             }
             else
             {
-                File.WriteAllText(Path.Combine(path, name) + ".jap", data);
+                File.WriteAllText(Path.Combine(path, name) + ".jap", name + data);
             }
 
-            await Navigation.PopAsync();
+            await Navigation.PopToRootAsync();
         }
 
         private int GetIndex(int x, int y)
@@ -295,9 +326,6 @@ namespace Nonograms
         private void Button_Clicked(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            int x, y;
-            GetCoordinates(table.Children.IndexOf(button), out x, out y);
-
             button.BackgroundColor = Color.FromRgb(tmpColor.Red, tmpColor.Green, tmpColor.Blue);
         }
     }

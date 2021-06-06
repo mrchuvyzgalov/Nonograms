@@ -4,7 +4,7 @@
              x:Class="Nonograms.Menu"
              BackgroundImageSource="Background.png">
     <ContentPage.Content>
-        <ScrollView>
+        <ScrollView HorizontalOptions="Center" VerticalOptions="Center">
             <StackLayout x:Name="MainStack" HorizontalOptions="Center" VerticalOptions="Center">
             </StackLayout>
         </ScrollView>

@@ -7,13 +7,11 @@
     <ContentPage.Content>
         <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
             <Label Text="Название кроссворда:" FontSize="Large" TextColor="Black" HorizontalOptions="Center"/>
-            <Entry x:Name="Name" HorizontalOptions="Center" Text="Пример:Шарик" BackgroundColor="White"/>
+            <Entry x:Name="Name" HorizontalOptions="Center" Text="" BackgroundColor="White" TextColor="Black" WidthRequest="150"/>
             <Label Text="Число строк:" FontSize="Large" TextColor="Black" HorizontalOptions="Center"/>
-            <Entry x:Name="CountOfRows" HorizontalOptions="Center" Text="Пример:5" BackgroundColor="White"/>
+            <Entry x:Name="CountOfRows" HorizontalOptions="Center" Text="" BackgroundColor="White" TextColor="Black" WidthRequest="50"/>
             <Label Text="Число столбцов: " FontSize="Large" TextColor="Black" HorizontalOptions="Center"/>
-            <Entry x:Name="CountOfCols" HorizontalOptions="Center" Text="Пример:5" BackgroundColor="White"/>
-            <Label Text="Цвета в формате RGB" FontSize="Large" TextColor="Black" HorizontalOptions="Center"/>
-            <Entry x:Name="Colors" Text="Пример:(255,0,0)(100,5,12)" HorizontalOptions="Center" BackgroundColor="White"/>
+            <Entry x:Name="CountOfCols" HorizontalOptions="Center" Text="" BackgroundColor="White" TextColor="Black" WidthRequest="50"/>
             <Grid HorizontalOptions="Center" Margin="2,2,2,2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -22,7 +20,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <ImageButton x:Name ="StartButton" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="StartButton_Clicked" BackgroundColor="Transparent"/>
-                <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Начать" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+                <Button HorizontalOptions="Center" VerticalOptions="Center" Text="Начать" TextColor="Black" FontSize="Medium" Grid.Row="0" Clicked="StartButton_Clicked" BackgroundColor="Transparent"/>
             </Grid>
         </StackLayout>
     </ContentPage.Content>

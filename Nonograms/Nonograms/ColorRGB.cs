@@ -6,7 +6,7 @@ namespace Nonograms
 {
     public class ColorRGB
     {
-        private int red = -1, green = -1, blue = -1;
+        public int red = -1, green = -1, blue = -1;
 
         public ColorRGB()
         {
@@ -15,6 +15,7 @@ namespace Nonograms
             this.blue = -1;
         }
 
+        
         public ColorRGB(int red, int green, int blue)
         {
             if (!IsCorrectColor(red) || !IsCorrectColor(green) || !IsCorrectColor(blue))
@@ -25,7 +26,14 @@ namespace Nonograms
             this.green = green;
             this.blue = blue;
         }
-
+        public bool isBright()
+        {
+            if (IsNone())
+            {
+                throw new Exception("Color is None");
+            }
+            return 1 - (0.299 * red + 0.587 * green + 0.114 * blue) / 255 < 0.5;
+        }
         public override bool Equals(object obj)
         {
             return obj is ColorRGB rGB &&
@@ -37,7 +45,6 @@ namespace Nonograms
         public static bool operator ==(ColorRGB color1, ColorRGB color2)
         {
             return color1.Equals(color2);
-            //return false;
         }
         public static bool operator !=(ColorRGB color1, ColorRGB color2)
         {

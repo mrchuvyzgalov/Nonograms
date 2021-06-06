@@ -9,5 +9,4 @@ namespace brute_force1 {
 	void changeMatrix(int row, int col, Matrix& table, const Matrix& rows, const Matrix& cols, bool& isFinish);
 
 	bool isCorrect(const Matrix& table, const Matrix& rows, const Matrix& cols);
-
 }

@@ -10,10 +10,12 @@ namespace Nonograms
         {
             InitializeComponent();
 
+            Application.Current.UserAppTheme = OSAppTheme.Light;
+
             MainPage = new NavigationPage(new MainPage())
             {
-                BarBackgroundColor = Color.LightGray,
-                BarTextColor = Color.White
+                BarBackgroundColor = Color.FromRgb(192,103,135),
+                BarTextColor = Color.Black
             };
         }
 

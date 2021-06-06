@@ -13,15 +13,23 @@ namespace Nonograms
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class Nonogram : ContentPage
 	{
-        string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        enum Level { Easy, Middle, Hard };
+
+        readonly string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         Matrix<KeyValuePair<int, ColorRGB>> m_row, m_col;
         Matrix<ColorRGB> matrix;
         Matrix<bool> hasXmatrix;
         HashSet<ColorRGB> colors = new HashSet<ColorRGB>();
         ColorRGB tmpColor = new ColorRGB(255, 255, 255);
-        bool hasX = false;
         string savepath;
         string[] parts;
+        Matrix<ColorRGB> solveMatrix;
+        bool isFinish = false;
+        int hitPoints;
+        int countOfHints;
+        Matrix<int> numbOfGroupRow, numbOfGroupCol;
+        Level tmpLevel;
+        int countAddCrosses = 0;
         public Nonogram (string path)
 		{
 			InitializeComponent ();
@@ -39,7 +47,86 @@ namespace Nonograms
 
             savepath = Path.Combine(folderPath, tmppath.Substring(1));
 
+            try
+            {
+                string[] lines = File.ReadAllText(Path.Combine(folderPath, "settings.txt")).Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                if (lines[0] == "Легкий")
+                {
+                    tmpLevel = Level.Easy;
+                }
+                else if (lines[0] == "Средний")
+                {
+                    tmpLevel = Level.Middle;
+                }
+                else 
+                {
+                    tmpLevel = Level.Hard;
+                }
 
+                countOfHints = int.Parse(lines[1]);
+            }
+            catch
+            {
+                PrintError("Ошибка чтения файла настроек");
+            }
+
+            ToolbarItem bulbButton = new ToolbarItem()
+            {
+                IconImageSource = "Bulb.png",
+                Order = ToolbarItemOrder.Primary,
+                Priority = 0
+            };
+
+            bulbButton.Clicked += async (s, e) =>
+            {
+                if (isFinish || hitPoints == 0) return;
+                if (countOfHints == 0)
+                {
+                    await DisplayAlert("Пусто", "Подсказки закончились", "Ок");
+                    return;
+                }
+                if (await DisplayAlert("Подсказка", "Использовать подсказку?\nОсталось: " + countOfHints, "Да", "Нет"))
+                {
+                    for (int row = 0; row < matrix.Rows; ++row)
+                    {
+                        for (int col = 0; col < matrix.Cols; ++col)
+                        {
+                            if (solveMatrix[row,col] == new ColorRGB(255,255,255) && !hasXmatrix[row,col])
+                            {
+                                ((Button)table.Children[GetNumber(row, col)]).Text = "X";
+                                hasXmatrix[row, col] = true;
+                                UpdateSettings();
+                                UpdateSaveFileAsync();
+                                countOfHints--;
+                                isFinish = IsAnswer();
+
+                                if (isFinish)
+                                {
+                                    await DisplayAlert("Победа", "Вы выиграли", "Ок");
+                                }
+                                return;
+                            }
+                            else if (matrix[row, col] != solveMatrix[row, col])
+                            {
+                                matrix[row, col] = solveMatrix[row, col];
+                                DrawCrossCondition(row, col);
+                                ((Button)table.Children[GetNumber(row, col)]).BackgroundColor = Color.FromRgb(matrix[row, col].Red, matrix[row, col].Green, matrix[row, col].Blue);
+                                UpdateSettings();
+                                UpdateSaveFileAsync();
+                                countOfHints--;
+                                isFinish = IsAnswer();
+                                if (isFinish)
+                                {
+                                    await DisplayAlert("Победа", "Вы выиграли", "Ок");
+                                }
+                                return;
+                            }
+                        } 
+                    }
+                }
+            };
+
+            ToolbarItems.Add(bulbButton);
 
             ToolbarItem clearButton = new ToolbarItem()
             {
@@ -50,23 +137,135 @@ namespace Nonograms
 
             clearButton.Clicked += (s,e) =>
             {
+                while (countAddCrosses > 0)
+                {
+                    table.Children.RemoveAt(table.Children.Count - 1);
+                    countAddCrosses--;
+                }
+                isFinish = false;
                 if (File.Exists(@savepath))
                 {
                     File.Delete(savepath);
                 }
 
+                for (int row = 0; row < matrix.Rows; ++row)
+                {
+                    for (int col = 0; col < matrix.Cols; ++col)
+                    {
+                        matrix[row, col] = new ColorRGB(255, 255, 255);
+                    }
+                }
+
+                for (int row = m_col.Cols; row < table.RowDefinitions.Count; ++row)
+                {
+                    for (int col = m_row.Cols; col < table.ColumnDefinitions.Count; ++col)
+                    {
+                        Button tmp = (Button)table.Children[row * table.ColumnDefinitions.Count + col];
+
+                        tmp.Text = "";
+                        if (matrix[row - m_col.Cols, col - m_row.Cols].IsNone())
+                        {
+                            tmp.BackgroundColor = Color.White;
+                        }
+                        else
+                        {
+                            tmp.BackgroundColor = Color.FromRgb(matrix[row - m_col.Cols, col - m_row.Cols].Red, matrix[row - m_col.Cols, col - m_row.Cols].Green, matrix[row - m_col.Cols, col - m_row.Cols].Blue);
+                        }
+                    }
+                }
+
+                if (tmpLevel == Level.Easy)
+                {
+                    hitPoints = 5;
+                }
+                else if (tmpLevel == Level.Middle)
+                {
+                    hitPoints = 3;
+                }
+                else
+                {
+                    hitPoints = 1;
+                }
+
+                Hearts.Children.Clear();
+                for (int i = 0; i < hitPoints; ++i)
+                {
+                    Image image = new Image
+                    {
+                        Source = "Heart.png"
+                    };
+
+                    Hearts.Children.Add(image);
+                }
+
                 try
                 {
-                    ReadFile(@path);
-                    DrawTable();
+                    UpdateSaveFileAsync();
                 }
                 catch
                 {
-                    PrintError("Файла не существует или в нем некорректные данные");
+                    PrintError("Ошибка обновления файла");
                 }
             };
 
             ToolbarItems.Add(clearButton);
+
+            ToolbarItem solveButton = new ToolbarItem()
+            {
+                Text = "Получить решение",
+                Order = ToolbarItemOrder.Secondary,
+                Priority = 1
+            };
+
+            solveButton.Clicked += (s, e) =>
+            {
+                while (countAddCrosses > 0)
+                {
+                    table.Children.RemoveAt(table.Children.Count - 1);
+                    countAddCrosses--;
+                }
+                for (int row = 0; row < matrix.Rows; ++row)
+                {
+                    for (int col = 0; col < matrix.Cols; ++col)
+                    {
+                        matrix[row, col] = solveMatrix[row, col];
+                        hasXmatrix[row, col] = false;
+                    }
+                }
+
+                for (int row = m_col.Cols; row < table.RowDefinitions.Count; ++row)
+                {
+                    for (int col = m_row.Cols; col < table.ColumnDefinitions.Count; ++col)
+                    {
+                        Button tmp = (Button)table.Children[row * table.ColumnDefinitions.Count + col];
+
+                        tmp.Text = "";
+                        if (matrix[row - m_col.Cols, col - m_row.Cols].IsNone())
+                        {
+                            tmp.BackgroundColor = Color.White;
+                        }
+                        else
+                        {
+                            tmp.BackgroundColor = Color.FromRgb(matrix[row - m_col.Cols, col - m_row.Cols].Red, matrix[row - m_col.Cols, col - m_row.Cols].Green, matrix[row - m_col.Cols, col - m_row.Cols].Blue);
+                        }
+                    }
+                }
+
+                DrawCrosses();
+
+                try
+                {
+                    UpdateSaveFileAsync();
+                }
+                catch
+                {
+                    PrintError("Ошибка обновления файла");
+                }
+
+                isFinish = true;
+            };
+
+            ToolbarItems.Add(solveButton);
 
             try
             {
@@ -92,6 +291,175 @@ namespace Nonograms
                 PrintError("Файла не существует или в нем некорректные данные");
             }
 
+            solveMatrix = NonogramSolve.Solve(m_row, m_col, colors);
+            numbOfGroupRow = new Matrix<int>(matrix.Rows, matrix.Cols);
+            numbOfGroupCol = new Matrix<int>(matrix.Rows, matrix.Cols);
+
+            for (int row = 0; row < matrix.Rows; ++row)
+            {
+                int countOfGroups = m_row.Cols;
+                while (countOfGroups > 0 && m_row[row, m_row.Cols - countOfGroups].Key == 0)
+                {
+                    countOfGroups--;
+                }
+                int numb = m_row.Cols - countOfGroups - 1;
+                bool newGroup = true;
+                for (int col = 0; col < matrix.Cols; ++col)
+                {
+                    if (solveMatrix[row, col] == new ColorRGB(255, 255, 255))
+                    {
+                        numbOfGroupRow[row, col] = -1;
+                        newGroup = true;
+                    }
+                    else
+                    {
+                        if (newGroup)
+                        {
+                            numbOfGroupRow[row, col] = ++numb;
+                            newGroup = false;
+                        }
+                        else
+                        {
+                            numbOfGroupRow[row, col] = numb;
+                        }
+
+                        if (col + 1 < matrix.Cols && solveMatrix[row, col + 1] != solveMatrix[row, col])
+                        {
+                            newGroup = true;
+                        }
+                    }
+                }
+            }
+
+            for (int col = 0; col < matrix.Cols; ++col)
+            {
+                int countOfGroups = m_col.Cols;
+                while (countOfGroups > 0 && m_col[col, m_col.Cols - countOfGroups].Key == 0)
+                {
+                    countOfGroups--;
+                }
+                int numb = m_col.Cols - countOfGroups - 1;
+                bool newGroup = true;
+                for (int row = 0; row < matrix.Rows; ++row)
+                {
+                    if (solveMatrix[row, col] == new ColorRGB(255, 255, 255))
+                    {
+                        numbOfGroupCol[row, col] = -1;
+                        newGroup = true;
+                    }
+                    else
+                    {
+                        if (newGroup)
+                        {
+                            numbOfGroupCol[row, col] = ++numb;
+                            newGroup = false;
+                        }
+                        else
+                        {
+                            numbOfGroupCol[row, col] = numb;
+                        }
+
+                        if (row + 1 < matrix.Rows && solveMatrix[row + 1, col] != solveMatrix[row, col])
+                        {
+                            newGroup = true;
+                        }
+                    }
+                }
+            }
+
+            isFinish = IsAnswer();
+
+            Device.StartTimer(TimeSpan.FromMilliseconds(100), DrawCrosses);
+        }
+
+        private bool DrawCrosses()
+        {
+            for (int row = 0; row < matrix.Rows; ++row)
+            {
+                for (int col = 0; col < matrix.Cols; ++col)
+                {
+                    DrawCrossCondition(row, col);
+
+                    Button button = ((Button)table.Children[GetNumber(row, col)]);
+                    button.FontSize = (int)(Math.Min(button.Height, button.Width) / 3);
+
+                    if (hasXmatrix[row,col])
+                    {
+                        button.Text = "X";
+                    }
+                }
+            }
+
+
+
+            return false;
+        }
+
+        private void DrawCrossCondition(int x, int y)
+        {
+            if (matrix[x, y] != new ColorRGB(255, 255, 255))
+            {
+                int countLeft = 0;
+                int col = y - 1;
+                while (col >= 0 && matrix[x, col] == matrix[x, y])
+                {
+                    countLeft++;
+                    col--;
+                }
+
+                int countRight = 0;
+                col = y + 1;
+                while (col < matrix.Cols && matrix[x, col] == matrix[x, y])
+                {
+                    countRight++;
+                    col++;
+                }
+
+                if (countLeft + countRight + 1 == m_row[x, numbOfGroupRow[x, y]].Key)
+                {
+                    countAddCrosses++;
+                    Image cross = new Image
+                    {
+                        Source = "Cross.png",
+                        BackgroundColor = Color.Transparent,
+                        HeightRequest = table.Children[0].Height,
+                        WidthRequest = table.Children[0].Width
+                    };
+
+                    table.Children.Add(cross, numbOfGroupRow[x, y], m_col.Cols + x);
+                }
+
+                int countUp = 0;
+                int row = x - 1;
+                while (row >= 0 && matrix[row, y] == matrix[x, y])
+                {
+                    countUp++;
+                    row--;
+                }
+
+                int countDown = 0;
+                row = x + 1;
+                while (row < matrix.Rows && matrix[row, y] == matrix[x, y])
+                {
+                    countDown++;
+                    row++;
+                }
+
+
+                if (countUp + countDown + 1 == m_col[y, numbOfGroupCol[x, y]].Key)
+                {
+                    countAddCrosses++;
+                    Image cross = new Image
+                    {
+                        Source = "Cross.png",
+                        BackgroundColor = Color.Transparent,
+                        HeightRequest = table.Children[0].Height,
+                        WidthRequest = table.Children[0].Width
+                    };
+
+                    table.Children.Add(cross, m_row.Cols + y, numbOfGroupCol[x, y]);
+                }
+            }
         }
 
         private void ReadFile(string file)
@@ -164,6 +532,19 @@ namespace Nonograms
                         int blue = int.Parse(line[i + 3]);
                         m_col[row, col] = new KeyValuePair<int, ColorRGB>(count, new ColorRGB(red, green, blue));
                     }
+                }
+
+                if (tmpLevel == Level.Easy)
+                {
+                    hitPoints = 5;
+                }
+                else if (tmpLevel == Level.Middle)
+                {
+                    hitPoints = 3;
+                }
+                else
+                {
+                    hitPoints = 1;
                 }
             }
 
@@ -293,6 +674,121 @@ namespace Nonograms
                 }
 
                 hasXmatrix = new Matrix<bool>(ArrayHasX);
+
+                string level = sr.ReadLine();
+                int hit = int.Parse(sr.ReadLine());
+                if (hit < 0 && hit > 5)
+                {
+                    PrintError("Неверное число жизней в файле сохранения");
+                }
+
+                if (level == "Легкий")
+                {
+                    if (tmpLevel == Level.Easy)
+                    {
+                        hitPoints = hit;
+                    }
+                    else if (tmpLevel == Level.Middle)
+                    {
+                        if (hit == 5)
+                        {
+                            hitPoints = 3;
+                        }
+                        else if (hit >= 3)
+                        {
+                            hitPoints = 2;
+                        }
+                        else if (hit >= 1)
+                        {
+                            hitPoints = 1;
+                        }
+                        else
+                        {
+                            hitPoints = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (hit == 0)
+                        {
+                            hitPoints = 0;
+                        }
+                        else
+                        {
+                            hitPoints = 1;
+                        }
+                    }
+                }
+                else if (level == "Средний")
+                {
+                    if (tmpLevel == Level.Easy)
+                    {
+                        if (hit == 3)
+                        {
+                            hitPoints = 5;
+                        }
+                        else if (hit == 2)
+                        {
+                            hitPoints = 3;
+                        }
+                        else if (hit == 1)
+                        {
+                            hitPoints = 1;
+                        }
+                        else
+                        {
+                            hitPoints = 0;
+                        }
+                    }
+                    else if (tmpLevel == Level.Middle)
+                    {
+                        hitPoints = hit;
+                    }
+                    else
+                    {
+                        if (hit == 0)
+                        {
+                            hitPoints = 0;
+                        }
+                        else
+                        {
+                            hitPoints = 1;
+                        }
+                    }
+                }
+                else if (level == "Сложный")
+                {
+                    if (tmpLevel == Level.Easy)
+                    {
+                        if (hitPoints == 1)
+                        {
+                            hitPoints = 5;
+                        }
+                        else
+                        {
+                            hitPoints = 0;
+                        }
+                    }
+                    else if (tmpLevel == Level.Middle)
+                    {
+                        if (hitPoints == 1)
+                        {
+                            hitPoints = 3;
+                        }
+                        else
+                        {
+                            hitPoints = 0;
+                        }
+                    }
+                    else
+                    {
+                        hitPoints = hit;
+                    }
+                }
+                else
+                {
+                    PrintError("Неверный уровень сложности в файле сохранения");
+                }
             }
         }
 
@@ -321,7 +817,7 @@ namespace Nonograms
                 table.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             }
 
-            // создание BoxView
+            // создание BoxView и Butttons
             for (int row = 0; row < table.RowDefinitions.Count; ++row)
             {
                 for (int col = 0; col < table.ColumnDefinitions.Count; ++col)
@@ -329,14 +825,14 @@ namespace Nonograms
                     if (row >= m_col.Cols && col >= m_row.Cols)
                     {
                         ColorRGB color = matrix[row - m_col.Cols, col - m_row.Cols];
-                        string text = hasXmatrix[row - m_col.Cols, col - m_row.Cols] ? "X" : "";
                         Button button1 = new Button
                         {
                             BackgroundColor = Color.FromRgb(color.Red, color.Green, color.Blue),
-                            Text = text
+                            TextColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White
                         };
 
                         button1.Clicked += Button_Click;
+                        button1.SizeChanged += Cell_SizeChanged;
 
                         table.Children.Add(button1, col, row);
                     }
@@ -355,7 +851,15 @@ namespace Nonograms
                     if (m_row[row, col].Key != 0)
                     {
                         table.Children[(m_col.Cols + row) * (m_col.Rows + m_row.Cols) + col].BackgroundColor = Color.FromRgb(m_row[row, col].Value.Red, m_row[row, col].Value.Green, m_row[row, col].Value.Blue);
-                        table.Children.Add(new Label { Text = m_row[row, col].Key.ToString(), FontSize = 23, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, TextColor = Color.White }, col, row + m_col.Cols);
+
+                        Color color = Color.White;
+                        if (m_row[row, col].Value.isBright())
+                        {
+                            color = Color.Black;
+                        }
+
+                        BoxView box = (BoxView)table.Children[(m_col.Cols + row) * (m_col.Rows + m_row.Cols) + col];
+                        table.Children.Add(new Label { Text = m_row[row, col].Key.ToString(), FontSize = (int)Math.Min(box.Width, box.Height) / 2, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, TextColor = color }, col, row + m_col.Cols);
                     }
                 }
             }
@@ -368,14 +872,51 @@ namespace Nonograms
                     if (m_col[row, col].Key != 0)
                     {
                         table.Children[col * (m_col.Rows + m_row.Cols) + row + m_row.Cols].BackgroundColor = Color.FromRgb(m_col[row, col].Value.Red, m_col[row, col].Value.Green, m_col[row, col].Value.Blue);
-                        table.Children.Add(new Label { Text = m_col[row, col].Key.ToString(), FontSize = 23, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, TextColor = Color.White }, row + m_row.Cols, col);
+
+                        Color color = Color.White;
+                        if (m_col[row, col].Value.isBright())
+                        {
+                            color = Color.Black;
+                        }
+                        BoxView box = (BoxView)table.Children[col * (m_col.Rows + m_row.Cols) + row + m_row.Cols];
+                        table.Children.Add(new Label { Text = m_col[row, col].Key.ToString(), FontSize = (int)Math.Min(box.Width, box.Height) / 2, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, TextColor = color }, row + m_row.Cols, col);
                     }
                 }
             }
 
+            // Создание жизней
+            int maxiHit = 5;
+            if (tmpLevel == Level.Middle)
+            {
+                maxiHit = 3;
+            }
+            else if (tmpLevel == Level.Hard)
+            {
+                maxiHit = 1;
+            }
+            for (int i = 0; i < hitPoints; ++i)
+            {
+                Image image = new Image
+                {
+                    Source = "Heart.png"
+                };
+
+                Hearts.Children.Add(image);
+            }
+            for (int i = hitPoints; i < maxiHit; ++i)
+            {
+                Image image = new Image
+                {
+                    Source = "DeadHeart.png"
+                };
+
+                Hearts.Children.Add(image);
+            }
+
+            // Создание палитры цветов
             colorsGrid.ColumnDefinitions.Clear();
             colorsGrid.Children.Clear();
-            for (int i = 0; i <= colors.Count + 1; ++i)
+            for (int i = 0; i <= colors.Count; ++i)
             {
                 colorsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             }
@@ -383,51 +924,67 @@ namespace Nonograms
             Button button = new Button
             {
                 BackgroundColor = Color.FromRgb(255, 255, 255),
-                BorderColor = Color.GreenYellow
+                TextColor = Color.Black,
+                Text = "X",
+                BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White,
+                BorderWidth = 5
             };
 
-            button.Clicked += Button_Click_Color;
+            button.SizeChanged += XButton_SizeChanged;
+            button.Clicked += Button_Click_X;
 
             colorsGrid.Children.Add(button, 0, 0);
 
-            button = new Button
-            {
-                BackgroundColor = Color.FromRgb(255, 255, 255),
-                Text = "X",
-                BorderColor = Color.Black
-            };
-
-            button.Clicked += Button_Click_X;
-
-            colorsGrid.Children.Add(button, 1, 0);
-
-            int numbOfColor = 2;
+            int numbOfColor = 1;
 
             foreach (ColorRGB color in colors)
             {
-                button = new Button
+                Button button1 = new Button
                 {
                     BackgroundColor = Color.FromRgb(color.Red, color.Green, color.Blue),
-                    BorderColor = Color.Black
+                    BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White
                 };
 
-                button.Clicked += Button_Click_Color;
+                button1.Clicked += Button_Click_Color;
 
-                colorsGrid.Children.Add(button, numbOfColor, 0);
+                colorsGrid.Children.Add(button1, numbOfColor, 0);
                 numbOfColor++;
             }
         }
 
+        private void XButton_SizeChanged(object sender, EventArgs e)
+        {
+            Button button = sender as Button;
+            button.FontSize = Math.Min(button.Width, button.Height) / 3;
+        }
+
+        private void Cell_SizeChanged(object sender, EventArgs e)
+        {
+            Button button = (Button)sender;
+            button.FontSize = Math.Min(button.Width, button.Height) / 4;
+        }
+
         private void Button_Click_X(object sender, EventArgs e)
         {
-            hasX = true;
             tmpColor = new ColorRGB(255, 255, 255);
-            for (int i = 0; i < colorsGrid.Children.Count; ++i)
-            {
-                ((Button)colorsGrid.Children[i]).BorderColor = Color.Black;
-            }
+            Button cross = (Button)sender;
+            cross.BorderWidth = 5;
+            cross.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White;
 
-            ((Button)sender).BorderColor = Color.GreenYellow;
+            for (int i = 1; i < colorsGrid.Children.Count; ++i)
+            {
+                Button tmpColor = (Button)colorsGrid.Children[i];
+                tmpColor.BorderWidth = 1;
+                ColorRGB color = new ColorRGB((int)(tmpColor.BackgroundColor.R * 255), (int)(tmpColor.BackgroundColor.G * 255), (int)(tmpColor.BackgroundColor.B * 255));
+                if (color.isBright())
+                {
+                    tmpColor.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White;
+                }
+                else
+                {
+                    tmpColor.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.White : Color.Black;
+                }
+            }
         }
 
         private void Button_Click_Color(object sender, EventArgs e)
@@ -437,36 +994,70 @@ namespace Nonograms
             int green = (int)(button.BackgroundColor.G * 255);
             int blue = (int)(button.BackgroundColor.B * 255);
             tmpColor = new ColorRGB(red, green, blue);
-            hasX = false;
 
-            for (int i = 0; i < colorsGrid.Children.Count; ++i)
+            Button cross = (Button)colorsGrid.Children[0];
+            cross.BorderWidth = 1;
+            cross.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White;
+
+            for (int i = 1; i < colorsGrid.Children.Count; ++i)
             {
-                ((Button)colorsGrid.Children[i]).BorderColor = Color.Black;
+                Button tmpColor = (Button)colorsGrid.Children[i];
+                tmpColor.BorderWidth = 1;
+                ColorRGB color = new ColorRGB((int)(tmpColor.BackgroundColor.R * 255), (int)(tmpColor.BackgroundColor.G * 255), (int)(tmpColor.BackgroundColor.B * 255));
+                if (color.isBright())
+                {
+                    tmpColor.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White;
+                }
+                else
+                {
+                    tmpColor.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.White : Color.Black;
+                }
             }
 
-            button.BorderColor = Color.GreenYellow;
+            ((Button)sender).BorderWidth = 5;
+            if (tmpColor.isBright())
+            {
+                button.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.Black : Color.White;
+            }
+            else
+            {
+                button.BorderColor = Application.Current.UserAppTheme == OSAppTheme.Light ? Color.White : Color.Black;
+            }
         }
 
         private async void Button_Click(object sender, EventArgs e)
         {
+            if (isFinish || hitPoints == 0) return;
+
             Button button = (Button)sender;
             int x, y;
             GetCoordinates(table.Children.IndexOf(button), out x, out y);
+
+            if (tmpColor != solveMatrix[x,y])
+            {
+                ((Image)Hearts.Children[--hitPoints]).Source = "DeadHeart.png";
+                await DisplayAlert("Ошибка", "Клетка имеет другой цвет", "Ок");
+                if (hitPoints == 0)
+                {
+                    await DisplayAlert("Проигрыш", "Жизней больше нет. Попробуйте заново", "Ок");
+                }
+                UpdateSaveFileAsync();
+                return;
+            } 
+
             ColorRGB lastColor = new ColorRGB((int)(255 * button.BackgroundColor.R), (int)(255 * button.BackgroundColor.G), (int)(255 * button.BackgroundColor.B));
 
-            if (!hasX)
-            {
-                button.Text = "";
-                hasXmatrix[x, y] = false;
-            }
-            else
+            if (tmpColor == new ColorRGB(255, 255, 255))
             {
                 button.Text = "X";
                 hasXmatrix[x, y] = true;
             }
-
-            button.BackgroundColor = Color.FromRgb(tmpColor.Red, tmpColor.Green, tmpColor.Blue);
-            matrix[x, y] = tmpColor;
+            else
+            {
+                button.BackgroundColor = Color.FromRgb(tmpColor.Red, tmpColor.Green, tmpColor.Blue);
+                matrix[x, y] = tmpColor;
+                DrawCrossCondition(x, y);
+            }
 
             try
             {
@@ -481,6 +1072,7 @@ namespace Nonograms
             {
                 if (IsAnswer())
                 {
+                    isFinish = true;
                     await DisplayAlert("Победа", "Вы выиграли", "Ок");
                 }
             }
@@ -537,6 +1129,21 @@ namespace Nonograms
                 }
                 data += "\n";
             }
+            
+            if (tmpLevel == Level.Easy)
+            {
+                data += "Легкий\n";
+            }
+            else if (tmpLevel == Level.Middle)
+            {
+                data += "Средний\n";
+            }
+            else
+            {
+                data += "Сложный\n";
+            }
+
+            data += hitPoints;
 
             string tmpPath = folderPath;
             for (int i = 0; i < parts.Length - 1; ++i)
@@ -551,6 +1158,12 @@ namespace Nonograms
             File.WriteAllText(@tmpPath, data);
         }
 
+        private void UpdateSettings()
+        {
+            string[] lines = File.ReadAllText(Path.Combine(folderPath, "settings.txt")).Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            File.WriteAllText(Path.Combine(folderPath, "settings.txt"), lines[0] + "\n" + countOfHints);
+        }
+
         private void GetCoordinates(int number, out int x, out int y)
         {
             number -= m_col.Cols * table.ColumnDefinitions.Count;
@@ -558,117 +1171,24 @@ namespace Nonograms
             y = number % table.ColumnDefinitions.Count - m_row.Cols;
         }
 
+        private int GetNumber(int x, int y)
+        {
+            int number = x * table.ColumnDefinitions.Count + y + m_row.Cols + m_col.Cols * table.ColumnDefinitions.Count;
+            int xout, yout;
+            GetCoordinates(number, out xout, out yout);
+            return x * table.ColumnDefinitions.Count + y + m_row.Cols + m_col.Cols * table.ColumnDefinitions.Count;
+        }
+
         private bool IsAnswer()
         {
-            for (int row = 0; row < m_row.Rows; ++row)
+            for (int row = 0; row < matrix.Rows; ++row)
             {
-                List<Pair<int, ColorRGB>> tmpRow = new List<Pair<int, ColorRGB>>();
-                bool newGroup = true;
-                for (int col = 0; col < m_col.Rows; ++col)
+                for (int col = 0; col < matrix.Cols; ++col)
                 {
-                    if (!(matrix[row, col].Red == 255 && matrix[row, col].Green == 255 && matrix[row, col].Blue == 255))
+                    if (solveMatrix[row, col] != matrix[row,col])
                     {
-                        if (newGroup)
-                        {
-                            Pair<int, ColorRGB> pair = new Pair<int, ColorRGB>(1, matrix[row, col]);
-                            tmpRow.Add(pair);
-                        }
-                        else
-                        {
-                            if (matrix[row, col] == tmpRow[tmpRow.Count - 1].Second)
-                            {
-                                tmpRow[tmpRow.Count - 1] = new Pair<int, ColorRGB>(tmpRow[tmpRow.Count - 1].First + 1, matrix[row, col]);
-                            }
-                            else
-                            {
-                                Pair<int, ColorRGB> pair = new Pair<int, ColorRGB>(1, matrix[row, col]);
-                                tmpRow.Add(pair);
-                            }
-                        }
-
-                        newGroup = false;
+                        return false;
                     }
-                    else
-                    {
-                        newGroup = true;
-                    }
-                }
-
-                int index = 0;
-                while (index < m_row.Cols && m_row[row, index].Value.IsNone())
-                {
-                    index++;
-                }
-
-                if (m_row.Cols - index == tmpRow.Count)
-                {
-                    for (int i = index; i < m_row.Cols; ++i)
-                    {
-                        if (m_row[row, i].Key != tmpRow[i - index].First || m_row[row, i].Value != tmpRow[i - index].Second)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            for (int col = 0; col < m_col.Rows; ++col)
-            {
-                List<Pair<int, ColorRGB>> tmpCol = new List<Pair<int, ColorRGB>>();
-                bool newGroup = true;
-                for (int row = 0; row < m_row.Rows; ++row)
-                {
-                    if (!(matrix[row, col].Red == 255 && matrix[row, col].Green == 255 && matrix[row, col].Blue == 255))
-                    {
-                        if (newGroup)
-                        {
-                            Pair<int, ColorRGB> pair = new Pair<int, ColorRGB>(1, matrix[row, col]);
-                            tmpCol.Add(pair);
-                        }
-                        else
-                        {
-                            if (matrix[row, col] == tmpCol[tmpCol.Count - 1].Second)
-                            {
-                                tmpCol[tmpCol.Count - 1] = new Pair<int, ColorRGB>(tmpCol[tmpCol.Count - 1].First + 1, matrix[row, col]);
-                            }
-                            else
-                            {
-                                Pair<int, ColorRGB> pair = new Pair<int, ColorRGB>(1, matrix[row, col]);
-                                tmpCol.Add(pair);
-                            }
-                        }
-
-                        newGroup = false;
-                    }
-                    else
-                    {
-                        newGroup = true;
-                    }
-                }
-
-                int index = 0;
-                while (index < m_col.Cols && m_col[col, index].Value.IsNone())
-                {
-                    index++;
-                }
-
-                if (m_col.Cols - index == tmpCol.Count)
-                {
-                    for (int i = index; i < m_col.Cols; ++i)
-                    {
-                        if (m_col[col, i].Key != tmpCol[i - index].First || m_col[col, i].Value != tmpCol[i - index].Second)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                else
-                {
-                    return false;
                 }
             }
 

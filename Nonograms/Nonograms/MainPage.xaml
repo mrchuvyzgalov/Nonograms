@@ -16,20 +16,20 @@
                 </Grid>
             </StackLayout>
 
-            <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="10,10,10,10" VerticalOptions="Center">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Margin="3,3,3,3" VerticalOptions="CenterAndExpand">
                 <Grid HorizontalOptions="Center" VerticalOptions="Center" Margin="10,10,10,10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <ImageButton x:Name ="PlayButton" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="PlayButton_Clicked" BackgroundColor="Transparent"/>
-                    <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Играть" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+                    <Button HorizontalOptions="Center" VerticalOptions="Center" Text="Играть" TextColor="Black" FontSize="Small" Grid.Row="0" Clicked="PlayButton_Clicked" BackgroundColor="Transparent"/>
                 </Grid>
                 <Grid HorizontalOptions="Center" VerticalOptions="Center" Margin="10,10,10,10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <ImageButton x:Name ="SolveButton" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="SolveButton_Clicked" BackgroundColor="Transparent"/>
-                    <Label HorizontalOptions="Center" VerticalOptions="Center" Text="Решить" TextColor="Black" FontSize="Medium" Grid.Row="0"/>
+                    <ImageButton x:Name ="SettingsButton" HorizontalOptions="Center" VerticalOptions="Center" Source="Button.png" Grid.Row="0" Clicked="SettingsButton_Clicked"  BackgroundColor="Transparent"/>
+                    <Button HorizontalOptions="Center" VerticalOptions="Center" Text="Настройки" TextColor="Black" FontSize="Small" Grid.Row="0" Clicked="SettingsButton_Clicked" BackgroundColor="Transparent"/>
                 </Grid>
             </StackLayout>
         </StackLayout>
