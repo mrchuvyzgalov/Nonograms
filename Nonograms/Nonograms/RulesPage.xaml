@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Nonograms.RulesPage"
+             BackgroundImageSource="Background.png"
+             Title="Правила">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout HorizontalOptions="Center" VerticalOptions="Center" BackgroundColor="White" Margin="10,10,10,10">
+                <Label Margin="10,10,10,10" FontSize="Small" HorizontalOptions="FillAndExpand" TextColor="Black" Text="Японский кроссворд представляет собой зашифрованный рисунок, в котором цифры слева от рядов и сверху над колонками показывают, сколько групп черных или цветных клеток находится в соответствующей линии и сколько черных или цветных клеток содержит каждая группа. Каждая клетка покрашена в определенный цвет - цвет группы. Пример строки кроссворда:"/>
+                <Image Source="Example1.jpg"/>
+                <Label Margin="10,10,10,10" FontSize="Small" HorizontalOptions="FillAndExpand" TextColor="Black" Text="Группы одного цвета разделены, по крайней мере, одной пустой клеткой. Если группы разных цветов, то между нимим пустой клетки может и не быть. Пример:"/>
+                <Image Source="Example2.jpg"/>
+                <Label Margin="10,10,10,10" FontSize="Small" HorizontalOptions="FillAndExpand" TextColor="Black" Text="Группы не всегда начинаются от края поля, т.е. пустые клетки могут быть и по краям рядов. Если вы никогда не решали японский кроссворд ознакомьтесь с примером решения:"/>
+                <Image Source="Example3.jpg"/>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

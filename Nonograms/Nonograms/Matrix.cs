@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Nonograms
 {
-    class Matrix<T>
+    public class Matrix<T>
     {
         T[,] matrix;
 
@@ -13,6 +13,21 @@ namespace Nonograms
             if (rows < 1 || cols < 1) throw new ArgumentException();
 
             matrix = new T[rows, cols];
+        }
+
+        public Matrix(Matrix<T> matrix)
+        {
+            if (matrix == null) throw new ArgumentException();
+
+            this.matrix = new T[matrix.Rows, matrix.Cols];
+
+            for (int i = 0; i < matrix.Rows; ++i)
+            {
+                for (int j = 0; j < matrix.Cols; ++j)
+                {
+                    this.matrix[i, j] = matrix[i, j];
+                }
+            }
         }
 
         public Matrix(T[,] matrix)
@@ -26,6 +41,31 @@ namespace Nonograms
                 for (int j = 0; j < matrix.GetLength(1); ++j)
                 {
                     this.matrix[i, j] = matrix[i, j];
+                }
+            }
+        }
+
+        public Matrix(List<List<T>> matrix)
+        {
+            if (matrix == null) throw new ArgumentException();
+
+            int rows = matrix.Count;
+            int cols = 0;
+            for (int i = 0; i < matrix.Count; ++i)
+            {
+                if (cols < matrix[i].Count)
+                {
+                    cols = matrix[i].Count;
+                }
+            }
+
+            this.matrix = new T[rows, cols];
+
+            for (int i = 0; i < rows; ++i)
+            {
+                for (int j = cols - matrix[i].Count; j < cols; ++j)
+                {
+                    this.matrix[i, j] = matrix[i][j - cols + matrix[i].Count];
                 }
             }
         }

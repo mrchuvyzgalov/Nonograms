@@ -8,15 +8,15 @@
 
   <Identity
     Name="25c773a0-d0ab-4ed9-8775-a4eb46fd30b3"
-    Publisher="CN=41cd1564-71cb-40a5-b3b2-32d4e68b2750"
-    Version="1.0.0.0" />
+    Publisher="CN=mrchuvyzgalov"
+    Version="2.2.8.0" />
 
   <mp:PhoneIdentity PhoneProductId="ec0cc741-fd3e-485c-81be-68815c480690" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Nonograms.UWP</DisplayName>
     <PublisherDisplayName>41cd1564-71cb-40a5-b3b2-32d4e68b2750</PublisherDisplayName>
-    <Logo>Icon.png</Logo>
+    <Logo>Icon50x50.jpg</Logo>
   </Properties>
 
   <Dependencies>
@@ -32,11 +32,11 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="Nonograms.UWP.App">
       <uap:VisualElements
-        DisplayName="Nonograms.UWP"
-        Square44x44Logo="Icon.png"
+        DisplayName="Nonograms"
+        Square44x44Logo="Icon88x88.jpg"
         Description="Nonograms.UWP"
-        BackgroundColor="transparent" Square150x150Logo="Icon.png">
-        <uap:DefaultTile  Square71x71Logo="Icon.png" Wide310x150Logo="Icon.png" Square310x310Logo="Icon.png">
+        BackgroundColor="transparent"  Square150x150Logo="Icon300x300.jpg">
+        <uap:DefaultTile  Square310x310Logo="Icon620x620.jpg" Wide310x150Logo="Icon620x300.jpg" Square71x71Logo="Icon142x142.jpg">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo"/>
             <uap:ShowOn Tile="wide310x150Logo"/>

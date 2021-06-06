@@ -1,12 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Nonograms.Nonogram">
+             x:Class="Nonograms.Nonogram"
+             BackgroundImageSource="Background.png">
+
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.8*"/>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="0.1*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="table" VerticalOptions="Start" HorizontalOptions="Fill" Grid.Row="0" Grid.Column="0" ColumnSpacing="1" RowSpacing="1">
+                
+            </Grid>
+            <StackLayout x:Name="Hearts"  Orientation="Horizontal" Grid.Row="1" Grid.Column="0" VerticalOptions="CenterAndExpand" HorizontalOptions="Center"/>
+            <Grid x:Name="colorsGrid" VerticalOptions="Fill" HorizontalOptions="Fill" Grid.Row="2" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    
+                </Grid.ColumnDefinitions>
+            </Grid>
+            
+        </Grid> 
     </ContentPage.Content>
 </ContentPage>

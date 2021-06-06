@@ -17,8 +17,15 @@
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <PackageCertificateThumbprint>9690DE2B16DE0EBE7762512F649C3DD78F4D4058</PackageCertificateThumbprint>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA512</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <GenerateTestArtifacts>True</GenerateTestArtifacts>
+    <AppxBundle>Always</AppxBundle>
+    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -88,6 +95,7 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
     <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -132,8 +140,36 @@
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
     <Content Include="awards.png" />
+    <Content Include="Background.png" />
+    <Content Include="Book.png" />
+    <Content Include="Bulb.png" />
+    <Content Include="Button.png" />
+    <Content Include="Cross.png" />
+    <Content Include="DeadHeart.png" />
+    <Content Include="Down.png" />
+    <Content Include="Example1.jpg" />
+    <Content Include="Example2.jpg" />
+    <Content Include="Example3.jpg" />
+    <Content Include="Heart.png" />
     <Content Include="Icon.png" />
+    <Content Include="Icon142x142.scale-100.jpg" />
+    <Content Include="Icon142x142.scale-200.jpg" />
+    <Content Include="Icon150x150.jpg" />
+    <Content Include="Icon300x300.scale-100.jpg" />
+    <Content Include="Icon300x300.scale-200.jpg" />
+    <Content Include="Icon310x150.jpg" />
+    <Content Include="Icon310x310.jpg" />
+    <Content Include="Icon44x44.jpg" />
+    <Content Include="Icon50x50.jpg" />
+    <Content Include="Icon620x300.scale-100.jpg" />
+    <Content Include="Icon620x300.scale-200.jpg" />
+    <Content Include="Icon620x620.scale-100.jpg" />
+    <Content Include="Icon620x620.scale-200.jpg" />
+    <Content Include="Icon71x71.jpg" />
+    <Content Include="Icon88x88.scale-100.jpg" />
+    <Content Include="Icon88x88.scale-200.jpg" />
     <Content Include="Properties\Default.rd.xml" />
+    <Content Include="Right.png" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -157,7 +193,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Black Crosswords\5x5\Snake.jap" />
+    <None Include="Nonograms.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
