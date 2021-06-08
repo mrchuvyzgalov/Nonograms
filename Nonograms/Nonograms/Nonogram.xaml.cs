@@ -87,41 +87,48 @@ namespace Nonograms
                 }
                 if (await DisplayAlert("Подсказка", "Использовать подсказку?\nОсталось: " + countOfHints, "Да", "Нет"))
                 {
+                    List<KeyValuePair<int,int>> freeCells = new List<KeyValuePair<int, int>>();
                     for (int row = 0; row < matrix.Rows; ++row)
                     {
                         for (int col = 0; col < matrix.Cols; ++col)
                         {
-                            if (solveMatrix[row,col] == new ColorRGB(255,255,255) && !hasXmatrix[row,col])
+                            if ((solveMatrix[row, col] == new ColorRGB(255,255,255) && !hasXmatrix[row,col]) || matrix[row,col] != solveMatrix[row,col])
                             {
-                                ((Button)table.Children[GetNumber(row, col)]).Text = "X";
-                                hasXmatrix[row, col] = true;
-                                UpdateSettings();
-                                UpdateSaveFileAsync();
-                                countOfHints--;
-                                isFinish = IsAnswer();
-
-                                if (isFinish)
-                                {
-                                    await DisplayAlert("Победа", "Вы выиграли", "Ок");
-                                }
-                                return;
-                            }
-                            else if (matrix[row, col] != solveMatrix[row, col])
-                            {
-                                matrix[row, col] = solveMatrix[row, col];
-                                DrawCrossCondition(row, col);
-                                ((Button)table.Children[GetNumber(row, col)]).BackgroundColor = Color.FromRgb(matrix[row, col].Red, matrix[row, col].Green, matrix[row, col].Blue);
-                                UpdateSettings();
-                                UpdateSaveFileAsync();
-                                countOfHints--;
-                                isFinish = IsAnswer();
-                                if (isFinish)
-                                {
-                                    await DisplayAlert("Победа", "Вы выиграли", "Ок");
-                                }
-                                return;
+                                freeCells.Add(new KeyValuePair<int, int>(row, col));
                             }
                         } 
+                    }
+
+                    int index = new Random().Next(freeCells.Count);
+                    if (solveMatrix[freeCells[index].Key, freeCells[index].Value] == new ColorRGB(255, 255, 255) && !hasXmatrix[freeCells[index].Key, freeCells[index].Value])
+                    {
+                        ((Button)table.Children[GetNumber(freeCells[index].Key, freeCells[index].Value)]).Text = "X";
+                        hasXmatrix[freeCells[index].Key, freeCells[index].Value] = true;
+                        UpdateSettings();
+                        UpdateSaveFileAsync();
+                        countOfHints--;
+                        isFinish = IsAnswer();
+
+                        if (isFinish)
+                        {
+                            await DisplayAlert("Победа", "Вы выиграли", "Ок");
+                        }
+                        return;
+                    }
+                    else if (matrix[freeCells[index].Key, freeCells[index].Value] != solveMatrix[freeCells[index].Key, freeCells[index].Value])
+                    {
+                        matrix[freeCells[index].Key, freeCells[index].Value] = solveMatrix[freeCells[index].Key, freeCells[index].Value];
+                        DrawCrossCondition(freeCells[index].Key, freeCells[index].Value);
+                        ((Button)table.Children[GetNumber(freeCells[index].Key, freeCells[index].Value)]).BackgroundColor = Color.FromRgb(matrix[freeCells[index].Key, freeCells[index].Value].Red, matrix[freeCells[index].Key, freeCells[index].Value].Green, matrix[freeCells[index].Key, freeCells[index].Value].Blue);
+                        UpdateSettings();
+                        UpdateSaveFileAsync();
+                        countOfHints--;
+                        isFinish = IsAnswer();
+                        if (isFinish)
+                        {
+                            await DisplayAlert("Победа", "Вы выиграли", "Ок");
+                        }
+                        return;
                     }
                 }
             };
